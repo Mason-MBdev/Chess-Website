@@ -25,7 +25,7 @@ class Piece {
         if (colDiff === 0) {
             for (let i = 1; i < Math.abs(rowDiff); i++) {
                 const row = oldRow + i * Math.sign(rowDiff);
-                if (pieces[row - 1][oldColumn - 1]) {
+                if (board.pieces[row - 1][oldColumn - 1]) {
                     console.log(`Piece in the way at ${oldColumn}${row}`);
                     return false;
                 }
@@ -36,7 +36,7 @@ class Piece {
         if (rowDiff === 0) {
             for (let i = 1; i < Math.abs(colDiff); i++) {
                 const column = oldColumn + i * Math.sign(colDiff);
-                if (pieces[oldRow - 1][column - 1]) {
+                if (board.pieces[oldRow - 1][column - 1]) {
                     console.log(`Piece in the way at ${column}${oldRow}`);
                     return false;
                 }
@@ -46,15 +46,13 @@ class Piece {
         // if the piece is moving diagonally
         if (Math.abs(rowDiff) === Math.abs(colDiff)) {
             for (let i = 1; i < Math.abs(rowDiff); i++) {
-                const row = oldRow + i * Math.sign(rowDiff);
-                const column = oldColumn + i * Math.sign(colDiff);
-                if (pieces[row - 1][column - 1]) {
-                    console.log(`Piece in the way at ${column}${row}`);
+                const testRow = this.currentPosition.row + i * Math.sign(rowDiff);
+                const testColumn = this.currentPosition.column + i * Math.sign(colDiff);
+                if (board.pieces[testRow - 1][testColumn - 1]) { // Subtract 1 from testRow and testColumn
                     return false;
                 }
             }
         }
-
         return true;
     }
 }
@@ -118,8 +116,6 @@ class Pawn extends Piece {
         console.log('Invalid move for pawn');
         return false; // Default to false if no valid move
     }
-    
-    
 }
 
 class Rook extends Piece {
@@ -135,6 +131,12 @@ class Rook extends Piece {
         const currentColumn = this.currentPosition.column;
         const newRow = newPosition.row;
         const newColumn = newPosition.column;
+
+        // if any square in the path you are moving ALONG TO REACH THE DISTINATION is blocked by a piece, return false
+        if (!this.getPath(this.currentPosition, newPosition, this.pieces)) {
+            console.log("Path is not clear cannot reach king.");
+            return false;
+        }
 
         // if the position the piece is trying to move to contains a piece of the same color, return false and log message with piece name
         if (board.pieces[newRow - 1][newColumn - 1] && board.pieces[newRow - 1][newColumn - 1].teamColor === this.teamColor) {
@@ -195,6 +197,12 @@ class Bishop extends Piece {
         const newRow = newPosition.row;
         const newColumn = newPosition.column;
 
+        // if any square in the path you are moving ALONG TO REACH THE DISTINATION is blocked by a piece, return false
+        if (!this.getPath(this.currentPosition, newPosition, this.pieces)) {
+            console.log("Path is not clear cannot reach king.");
+            return false;
+        }
+
         // if the position the piece is trying to move to contains a piece of the same color, return false and log message with piece name
         if (board.pieces[newRow - 1][newColumn - 1] && board.pieces[newRow - 1][newColumn - 1].teamColor === this.teamColor) {
             console.log(`Cannot move to ${newColumn}${newRow} because it contains a piece of the same color`);
@@ -225,8 +233,14 @@ class Queen extends Piece {
         const rookMove = (new Rook(this.currentPosition, this.teamColor)).isValidMove(newPosition);
         const bishopMove = (new Bishop(this.currentPosition, this.teamColor)).isValidMove(newPosition);
 
-        console.log(`Rook move: ${rookMove}, Bishop move: ${bishopMove}`);
+        if (rookMove || bishopMove) {
+            console.log('Path is clear for either Rook or Bishop move');
+        } else {
+            console.log('Path is blocked for either Rook or Bishop move');
+            return false;
+        }
 
+        console.log(`Rook move: ${rookMove}, Bishop move: ${bishopMove}`);
 
         // log old position x and y
         console.log(`Old position: ${this.currentPosition.column}${this.currentPosition.row}`);
@@ -251,6 +265,8 @@ class King extends Piece {
     }
 
     isValidMove(newPosition) {
+        console.log('KING FLAG 4');
+        console.log('newPosition: ', newPosition);
         const currentRow = this.currentPosition.row;
         const currentColumn = this.currentPosition.column;
         const newRow = newPosition.row;
@@ -290,6 +306,51 @@ class King extends Piece {
             }
         }
         console.log(`${this.teamColor} king is not in check`);
+        return false;
+    }
+
+    // isInCheckParameters() {
+    isInCheckParameters(kingPosition) {
+        console.log('KING FLAG 5');
+        console.log('kingPosition: ', kingPosition);
+        // log the king position
+        console.log(`King position: ${kingPosition.column}${kingPosition.row}`);
+        for (let row = 1; row <= 8; row++) {
+            for (let column = 1; column <= 8; column++) {
+                const piece = board.pieces[row - 1][column - 1];
+                if (piece && piece.teamColor!== this.teamColor) {
+                    // log the piece name and position
+                    console.log(`Checking ${piece.constructor.name} at ${column}${row} for attack on king`);
+                    console.log(`King position: ${kingPosition.column}${kingPosition.row}`);
+
+                    if (piece.isValidMove(kingPosition)) {
+                        console.log(`King is in check by ${piece.constructor.name} at ${column}${row}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+                        return true;
+                    }
+                }
+            }
+        }
+        console.log(`${this.teamColor} king is not in check`);
+        return false;
+    }
+
+    canKingEscape(kingPosition) {
+        console.log('KING FLAG 69');
+        // Iterate through all possible moves for the king
+        for (let row = 1; row <= 8; row++) {
+            for (let column = 1; column <= 8; column++) {
+                const newPosition = { row, column };
+    
+                // Check if the move is valid and would take the king out of check
+                if (isValidMove(kingPosition)) {
+                    console.log(`King can escape to ${column}${row}`);
+                    return true; // Found a valid move that takes the king out of check
+                }
+            }
+        } 
+        // If no valid moves were found, the king cannot escape
+        console.log('CHECKMATE GAMEOVER FLAG');
+        gameOver();
         return false;
     }
 }

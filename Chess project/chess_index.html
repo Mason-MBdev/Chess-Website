@@ -7,40 +7,137 @@
 </head>
 <body>
 
-    <div class="game-container">
-        <div class="scoreboard" id="black-scoreboard">
-            <h2>Black</h1>
-            <h3>Timer:</h3> 
-            <span id="black-timer">00:00</span>
-            <h3>Score:</h3>
-            <span id="black-score">0</span>
-            
+    <div class="nav">
+        <div class="nav-left" style="display: flex; align-items: center; justify-self: center;">
+            <h1 style="font-size: 30px; margin-left: 25px;">Chess V.2</h1>
+        </div>
+
+        <div class="nav-right">
+            <button id="menu-button" onclick="location.reload();">Reload Game</button>
+        </div>
+    </div>
+
+    <div class="main_window">
+    <div class="game-container with-linear-gradient">
+        <div id="black">
+            <div class="scoreboard" id="black-scoreboard">
+                <h2>Black</h1>
+
+                <div class="infobox">
+                    <h3>Time:</h3> 
+                    <span id="black-timer">Unlimited</span>
+                </div>
+                
+                <div class="infobox">
+                    <h3>Score:</h3>
+                    <span id="black-score">0</span>
+                </div>
+                <div class="infobox" style="margin-top: 40px;">
+                    <h3>Pieces Taken:</h3>
+                    <div class="piece-box" id="piece-box-black"></div>
+                </div>
+            </div>
         </div>
         
         <div class="chessboard" id="chessboard"></div>
 
-        <div class="scoreboard" id="white-scoreboard">
-            <h2>White</h1>
-            <h3>Timer:</h3> 
-            <span id="white-timer">00:00</span>
-            <h3>Score:</h3>
-            <span id="white-score">0</span>
-        <div>
+        <div id="white">
+            <div class="scoreboard" id="white-scoreboard">
+                <h2>White</h1>
+
+                <div class="infobox">
+                    <h3>Time:</h3> 
+                    <span id="white-timer">Unlimited</span>
+                </div>
+
+                <div class="infobox">
+                    <h3>Score:</h3>
+                    <span id="white-score">0</span>
+                </div>
+                <div class="infobox">
+                    <h3>Pieces Taken:</h3>
+                    <div class="piece-box" id="piece-box-white"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- <div class="overlay"></div>
-
-    <div class="game-over">
+    <!-- <div class="game-over">
         <h1>Game Over</h1>
         <h2 id="game-over-text"></h2>
         <button id="restart-button">Restart</button>
-    </div>
-
-    <div class="start-menu" id="start-menu">
-        <h1>Chess</h1>
-        <button id="start-button">Start</button>
     </div> -->
 
+    <div id="popup-menu" class="popup">
+        <div class="popup-content">
+            <h1>Online Chess</h1>
+            <div class="menu-container">
+                <div class="right-popup">
+                    <h2> Instructions </h2>
+                    <p> <b>Select a mode to get started</b> </p>
+
+                    <p> <b>Local:</b> <br><br> Play with a friend locally by switching controls every turn, <br>set a turn timer if you want a faster paced game.</p>
+                    <p> <b>Multiplayer:</b> <br><br> Play with a friend online by hosting (or connecting to) a room. <br><br><b>*not complete yet*</b></p>
+                </div>
+                <div class="left-popup">
+                    
+                    <h2>Settings</h2>
+
+                    <div class="mode">
+                        <h3>Mode:</h3>
+                        <select id="game-type-input">
+                            <option value="single">Local</option>
+                            <option value="multi">Online-Multiplayer</option>
+                        </select><br>
+                    </div>
+
+                    <div class="Local" style="display: block;">
+                        <h3>Time:</h3>
+                        <p>(Enter in minutes, leave blank for unlimited)</p>
+                        <input type="text" id="time-input" placeholder="Unlimited"><br>
+                        <button id="start-button">Start</button><br><br>
+                    </div>
+
+                    <div class="Online" style="display: none;">
+                        <h3>Room Code:</h3>
+                        <input type="text" id="room-code-input" placeholder="..."> 
+                        <h3> Password: </h3>
+                        <input type="text" id="room-password-input" placeholder="..."><br>
+                        <button id="join-button" onclick="alert('This feature is not complete yet')">Join</button>
+                        <button id="join-button" onclick="alert('This feature is not complete yet')">Host</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="overlay"></div>
+    <!-- Script for the drop down selection -->
+    <script>
+        const gameTypeInput = document.getElementById("game-type-input");
+        const localMode = document.querySelector(".Local");
+        const onlineMode = document.querySelector(".Online");
+
+        gameTypeInput.addEventListener("change", function() {
+            if (gameTypeInput.value === "single") {
+                localMode.style.display = "block";
+                onlineMode.style.display = "none";
+            } else if (gameTypeInput.value === "multi") {
+                localMode.style.display = "none";
+                onlineMode.style.display = "block";
+            }
+        });
+    </script>
+
+    <script>
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 768) {
+                alert('This website is intended to be viewed on a desktop, if you are on a phone or tablet, you may try rotating the phone to get a better look but you are most likely looking at a formatting nightmare.');
+            }
+        });
+    </script>
+
+    <!-- JS -->
+    <script src="./JS/timer.js"></script>
     <script src="./JS/movement.js"></script>
     <script src="./JS/pieces.js"></script>
     <script src="./JS/display.js"></script>

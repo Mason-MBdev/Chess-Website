@@ -90,6 +90,8 @@ class Board {
         if (capturingPiece) {
             console.log(`Captured ${capturingPiece.constructor.name} at ${newColumn}${newRow}`);
             this.removePiece(newPosition);
+            takenPieces.increaseScoreCounter(this.currentPlayer, capturingPiece);
+            takenPieces.renderTakenPieces();
         }
 
         this.removePiece(piecePosition);
@@ -126,5 +128,36 @@ class Board {
 
     printBoard() {
         console.log(this.pieces);
+    }
+
+    canKingEscape(kingPosition) {
+        console.log('KING FLAG 2');
+
+        // Assuming kingPosition is an object with row and column properties
+        for (let row = 1; row <= 8; row++) {
+            for (let column = 1; column <= 8; column++) {
+                const newPosition = { row, column };
+                console.log('New Position: ', newPosition);
+                if (this.kingIsValidMove(kingPosition, newPosition)) {
+                    if (!this.pieces[kingPosition.row - 1][kingPosition.column - 1].isInCheckParameters(newPosition)) {
+                        console.log(`King can escape to ${column}${row}`);
+                        return true; // Found a valid move that takes the king out of check
+                    }
+                }
+            }
+        }
+        console.log('King cannot escape check');
+        return false;
+    }
+
+    kingIsValidMove(oldPosition, newPosition) {
+        console.log('KING FLAG 3');
+        console.log('New Position: ', newPosition);
+
+        const piece = this.pieces[oldPosition.row - 1][oldPosition.column - 1];
+        if (piece instanceof King) {
+            return piece.isValidMove(newPosition);
+        }
+        return false;
     }
 }

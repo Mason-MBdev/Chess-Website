@@ -60,10 +60,27 @@ function handleCellClick(event) {
             displayBoard(board);
             console.log('Piece placed');
             board.switchPlayer();
+    
+            // After the move, check if either king is in check
+            const whiteKing = board.findKingByTeamColor('white');
+            const blackKing = board.findKingByTeamColor('black');
+    
+            if (whiteKing && whiteKing.isInCheck()) {
+                console.log('White king is in check');
+                if (!board.canKingEscape(whiteKing.currentPosition)) {
+                    alert('White king is in checkmate! Game over!');
+                    // Handle checkmate or stalemate condition
+                }
+            }
+    
+            if (blackKing && blackKing.isInCheck()) {
+                console.log('Black king is in check KING FLAG 1');
+                if (!board.canKingEscape(blackKing.currentPosition)) {
+                    alert('Black king is in checkmate! Game over!');
+                    // Handle checkmate or stalemate condition
+                }
+            }
 
-            // Check for both kings after the move
-            board.findKingByTeamColor('white').isInCheck();
-            board.findKingByTeamColor('black').isInCheck();
         } else {
             console.log('Invalid move');
         }
@@ -71,6 +88,10 @@ function handleCellClick(event) {
         const cells = document.querySelectorAll('.cell');
         cells.forEach(cell => cell.classList.remove('highlight'));
         selectedPiece = null;
+        const timerElement1 = document.getElementById('black-timer');
+        const timerElement2 = document.getElementById('white-timer');
+        timer.switchPlayer(timerElement1, timerElement2);
+        timer.updateTimerElement(timerElement1, timerElement2);
     }
 }
 
